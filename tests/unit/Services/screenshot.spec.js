@@ -7,12 +7,13 @@ chai.use(chaiHttp);
 
 describe('screenshots', function(){
 
-    it('should return an object with a thumbs property', function () {
-      expect(scrnsht('JohnDoe')).to.return.an('object');
-      let returnval = scrnsht('johndoe');
-      expect(returnval.thum).to.have.own.property('thumb');
+    it('should return an object', function () {
+      expect(scrnsht('JohnDoe')).to.be.an('object');
     });
-    it('should return a thumbs property with a string containing thumb/', function () {
+  it('should have a propery thumbs', function () {
+    expect (scrnsht('johndoe')).to.have.own.property('thumb');
+  });
+  it('should return a thumbs property with a string containing thumb/', function () {
       let returnval = scrnsht('janedoe');
       expect(returnval.thumb).to.include('thumb/');
     });
