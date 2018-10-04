@@ -1,0 +1,19 @@
+# Standard node modules
+node_modules/
+
+# Logs
+logs/
+npm-debug.log
+
+# Unit test reports
+coverage/
+
+# Eslint reports
+reports/
+
+.idea
+.vscode
+*.iml
+*.iws
+.DS_Store
+npm-debug.log

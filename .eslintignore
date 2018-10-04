@@ -1,0 +1,14 @@
+# Standard node modules
+node_modules/
+
+# Coverage
+coverage/
+
+# Swagger
+swagger/
+
+# Client
+client/
+
+# ide
+.idea/
