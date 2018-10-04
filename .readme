@@ -1,2 +1,5 @@
 status:
 currently this is an unstable project. Don't use it.
+
+tests:
+make sure you install istanbul global
