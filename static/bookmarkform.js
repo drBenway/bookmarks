@@ -1,7 +1,12 @@
 class BookMarkForm extends HTMLElement {
+
+
+  /* ---------------- CONSTRUCTOR  ------------------------*/
+
+
   constructor() {
     super();
-
+    this.preview = "thumb/default.png";
 
     // We attach an open shadow root to the custom element
     const shadowRoot = this.attachShadow({mode: 'open'});
@@ -35,23 +40,21 @@ class BookMarkForm extends HTMLElement {
              }
              
         `;
-    const preview = "thumb/default.png";
+
 
     // We provide the shadow root with some HTML
     shadowRoot.innerHTML = `
             <style>${styles}</style>
             <form  class="bookmarkform">
                 <div id="preview">
-                <img src="${preview}" />
-                <input type="submit" value="<" />
-                <input type="submit" value=">" />
+                <img src="${this.preview}" id="previewthumb"/>
                 <div id="takeScreenshot" />takescreenshot</div>
                 </div>
                 <div id="metadata">
                 <label for="url">url:</label>
-                <input type="text" id="url" />
+                <input type="text" id="url" value="${this.url}" />
                 <label for="tags">tags:</label>
-                <input type="text" id="tags" />
+                <input type="text" id="tags" value="${this.tags}" />
                 <input type="submit" id="submit" onclick="submitForm()" return false />
                 </div>
             </form>
@@ -61,58 +64,103 @@ class BookMarkForm extends HTMLElement {
   }
 
 
+
+  /* ---------------- CALLBACKS  ------------------------*/
+
   connectedCallback() {
     this.addBtnEventListener(this);
   }
 
-  hasUrl() {
-    return true;
+  attributeChangedCallback(name, oldValue, newValue) {
+    console.log('Custom square element attributes changed.');
+    //updateStyle(this);
   }
 
-  hasTags() {
-    return true;
+
+  /* ---------------- ATRIBUTES  ------------------------*/
+ get url() {
+   return this.getAttribute('url');
+  }
+  set url(newvalue){
+    this.setAttribute('url', newvalue);
   }
 
-  getScreenshot() {
 
+
+  get tags() {
+    return this.getAttribute('tags').split(',');
+  }
+
+  set tags(newvalue){
+   this.setAttribute('tags', newvalue.toString());
+  }
+
+
+  getFormUrl (){
+    return this.shadowRoot.getElementById('url').value;
+  }
+  getFormTags(){
+   return this.shadowRoot.getElementById('tags').value;
   }
 
   addBtnEventListener(el) {
     const shadow = el.shadowRoot;
     const btn_scrnshot = shadow.querySelector("#takeScreenshot");
-
-    btn_scrnshot.addEventListener('click',this.takeScreenshot);
+    btn_scrnshot.addEventListener('click',this.takeScreenshot.bind(el));
   }
 
 
   submitForm() {
+
     if (this.hasUrl() && this.hasTags()) {
+      var bodystring = 'url=' + this.getFormUrl() + '&tags=' + this.getFormTags() + '&thumb=' + this.preview;
       fetch('api/bookmarks', {
         method: 'post',
         headers: {
           "content-type": "application/x-www.form-urlencoded; charset=UTF-8"
         },
-        body: 'url = http://www.westworld.be&tags=private,public&thumb=thumb/1AZERAZERQSQZEAZE.png'
+        body: bodystring
       })
     }
   }
 
+  updatePreview(url){
+   let tag = this.shadowRoot.getElementById('previewthumb');
+   console.log(tag);
+   tag.setAttribute('src', url);
+  }
+
+
+
+  resolveScreenshot(response) {
+    console.log('3.resolve screenshot triggered');
+    let self = this;
+    if (response.status !== 200) {
+      console.log('Looks like there was a problem. Status Code: ' +
+        response.status);
+      return;
+    }
+
+    // Examine the text in the response
+    response.json().then(function (data) {
+      console.log('4.' + data);
+      self.preview = data.thumb;
+      console.log(self.preview);
+      setTimeout(function(){self.updatePreview(self.preview)},2000);
+
+    });
+
+  }
+
+
 
   takeScreenshot() {
-
-    this.url = "http://localhost:3000/api/screenshots?url=http://www.westworld.be/";
-      fetch(this.url).then(
-        function (response) {
-          if (response.status !== 200) {
-            console.log('Looks like there was a problem. Status Code: ' +
-              response.status);
-            return;
-          }
-
-          // Examine the text in the response
-          response.json().then(function (data) {
-            console.log(data);
-          });
+    let that = this;
+    console.log('1.takescreenshot' + that.getFormUrl());
+    let url = "http://localhost:3000/api/screenshots?url=" + that.getFormUrl();
+      fetch(url).then((response)=>{
+        console.log(' 2.calling resolve screenshot');
+        that.resolveScreenshot(response);
         }
       )
         .catch(function (err) {
