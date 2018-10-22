@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script src="../../node_modules/web-component-tester/browser.js"></script>
+  <script src="../../static/bookmarkgrid.js.js"></script>
+  <script src="../../node_modules/@webcomponents/webcomponentsjs/webcomponents-lite.js"></script>
+</head>
+<body>
+<book-mark-grid></book-mark-grid>
+<script>
+  suite('<book-mark-grid>', function() {
+    let component = document.querySelector('book-mark-grid');
+    test('renders div', () => {
+      assert.isOk(component.shadowRoot.querySelector('div'));
+    });
+  });
+</script>
+</body>
+</html>

@@ -13,6 +13,7 @@ class BookMark extends HTMLElement {
 
     
     figure {
+      font-family: 'Roboto', sans-serif;
       display: block;
       position: relative;
       float: left;
@@ -22,6 +23,10 @@ class BookMark extends HTMLElement {
       width: 300px;
       height: 200px;
       
+    }
+    figure img{
+      width: 100%;
+      height: 100%;
     }
     figcaption {
       position: absolute;

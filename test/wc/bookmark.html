@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+  <script src="../../node_modules/web-component-tester/browser.js"></script>
+  <script src="../../static/bookmark.js"></script>
+  <script src="../../node_modules/@webcomponents/webcomponentsjs/webcomponents-lite.js"></script>
+</head>
+<body>
+<book-mark></book-mark>
+<script>
+  suite('<book-mark>', function() {
+    let component = document.querySelector('book-mark');
+    test('renders div', () => {
+      assert.isOk(component.shadowRoot.querySelector('div'));
+    });
+  });
+</script>
+</body>
+</html>

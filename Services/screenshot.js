@@ -1,55 +1,78 @@
 const crypto = require('crypto');
-//const webshot = require('node-webshot');
-const capture = require('capture-phantomjs');
+const capture = require('capture-chrome');
 const fs = require('fs');
-const util = require('util');
-
-// Convert fs.writeFile into Promise version of same
-const writeFile = util.promisify(fs.writeFile);
-
-async function writeScreenshot(path, data) {
-  return await writeFile(path, data);
-}
+const fsPromises = fs.promises;
 
 
-
-
-
-
-let screenshot = function (url) {
-        let target = url.toString();
-        let crypt = crypto.randomBytes(20).toString('hex');
-        let path = "thumb/" + crypt + ".png";
-
-  capture({
+let capture_screen = async function (target) {
+  //console.log('capturing');
+  return capture({
     url: target,
-    width: 400,
-    height: 300
-  }).then(screenshot => {
-    console.log('screenshot for' + `static/${path}`);
-    //fs.writeFileSync(`static/${path}`, screenshot);
-    //await fs.writeFile(`static/${path}`, screenshot);
-    writeScreenshot(`static/${path}`, screenshot)
-      .then(()=>{
-        let json = {thumb: `${path}`};
-        return json;
+    width: 1024,
+    height: 768
+  });
+};
+
+let write_thumb = async function (path, screencap) {
+
+  //console.log('writing');
+  //console.log(path);
+  //console.log(screencap);
+  try {
+    let write = await fsPromises.writeFile(`${__dirname}/../static/${path}`, screencap);
+    return Promise.resolve({thumb: path});
+  }
+  catch (error) {
+    //console.log('error writing file');
+    //console.log(error);
+    return Promise.reject({thumb: "thumb/default.png"});
+  }
+};
+
+
+let screenshot = async function (url) {
+  //console.log('setup');
+  const target = url.toString();
+  const crypt = crypto.randomBytes(20).toString('hex');
+  const path = "thumb/" + crypt + ".png";
+  //console.log('url ' + target + " path " + path);
+
+  let screen = await capture_screen(target);
+  let writento = await write_thumb(`${path}`, screen);
+  console.log(writento);
+  if (writento.thumb !== 'thumb/default.png') {
+    console.log(writento);
+    return Promise.resolve(writento);
+  }
+  else {
+    return Promise.reject(writento);
+  }
+
+
+  /*.
+    then(screenshot => {
+      return new Promise(function (resolve, reject) {
+        fs.writeFile("<filename.type>", data, '<file-encoding>', function (err) {
+          if (err) reject(err);
+          else resolve(data);
+        });
       });
-
-  })
-    .catch(()=>{
-      return {thumb: 'thumb/default.png'};
+      try {
+        console.log('writing file');
+        fs.writeFileSync(`${__dirname}/../static/${path}`, screenshot);
+        console.log('resolving promise');
+        promise.resolve({thumb: path});
       }
-    );
+      catch (e) {
+        console.log('error: ' + e);
+        promise.reject(Error("It broke"));
+      }
 
-
-// make this return a promise
+    });*/
 
 
 };
 module.exports = screenshot;
-
-
-
 
 
 
