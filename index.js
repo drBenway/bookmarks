@@ -5,6 +5,13 @@ const jsonParser  = bodyParser.json();
 let app = express();
 app.set('view engine', 'ejs');
 
+
+// parse application/json
+app.use(jsonParser);
+
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 // For the database
 let sqlite3 = require('sqlite3');
 let db = new sqlite3.Database('./bookmark.sqlite');

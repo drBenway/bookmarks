@@ -1,3 +1,5 @@
+
+
 class BookMarkForm extends HTMLElement {
 
 
@@ -92,7 +94,7 @@ class BookMarkForm extends HTMLElement {
                 <label for="tags">tags:</label>
                 <input type="text" id="tags" value="${this.tags}" />
                 <div></div>
-                <div class="btn" id="submit" onclick="submitForm()" />Submit</div>
+                <div class="btn" id="submit" />Submit</div>
                 
             </form>
         `;
@@ -106,6 +108,7 @@ class BookMarkForm extends HTMLElement {
 
   connectedCallback() {
     this.addBtnEventListener(this);
+    this. enableSubmit();
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -134,13 +137,13 @@ class BookMarkForm extends HTMLElement {
 
   disableSubmit(){
    const submitbtn = this.shadowRoot.getElementById('submit');
-    submitbtn.setAttribute('onclick', '');
+    submitbtn.removeEventListener('click',this.submitForm.bind(this));
     submitbtn.classList.add('disable');
   }
 
   enableSubmit(){
     const submitbtn = this.shadowRoot.getElementById('submit');
-    submitbtn.setAttribute('onclick', 'submitForm()');
+    submitbtn.addEventListener('click', this.submitForm.bind(this));
     submitbtn.classList.remove('disable');
   }
 
@@ -164,19 +167,20 @@ class BookMarkForm extends HTMLElement {
 
 
   submitForm() {
-
+    console.log('submit form');
     if (this.url !== '' && this.tags !== []) {
-      var bodystring = 'url=' + this.url + '&tags=' + this.tags + '&thumb=' + this.preview;
-      console.log(bodystring);
-      fetch('api/bookmarks', {
-        method: 'post',
-        headers: {
-          "content-type": "application/x-www.form-urlencoded; charset=UTF-8"
-        },
-        body: bodystring
-      })
+      let bodystring = {url: this.url,tags: this.tags,thumb: this.preview};
+      fetch('http://localhost:3000/api/bookmarks',
+        {
+          method: 'post',
+          body: JSON.stringify(bodystring),
+          headers: new Headers({"Content-Type": "application/json"})
+        });
     }
   }
+
+
+
 
   updatePreview(url){
    let tag = this.shadowRoot.getElementById('previewthumb');
@@ -200,7 +204,8 @@ class BookMarkForm extends HTMLElement {
       console.log('4.' + data);
       self.preview = data.thumb;
       console.log(self.preview);
-      setTimeout(function(){self.updatePreview(self.preview)},2000);
+      self.updatePreview(self.preview)
+      //setTimeout(function(){self.updatePreview(self.preview)},2000);
 
     });
 
@@ -214,10 +219,12 @@ class BookMarkForm extends HTMLElement {
     let url = "http://localhost:3000/api/screenshots?url=" + that.getFormUrl();
     // show an animation in the preview
     this.updatePreview('thumb/waiting.gif');
+    this.disableSubmit();
     console.log('1.takescreenshot: ' + url);
       fetch(url).then((response)=>{
         console.log(' 2.calling resolve screenshot');
         that.resolveScreenshot(response);
+        that.enableSubmit();
         }
       )
         .catch(function (err) {
