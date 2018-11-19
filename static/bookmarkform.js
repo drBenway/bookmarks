@@ -9,6 +9,7 @@ class BookMarkForm extends HTMLElement {
   constructor() {
     super();
     this.preview = "thumb/default.png";
+    this.submitable = true;
 
     // We attach an open shadow root to the custom element
     const shadowRoot = this.attachShadow({mode: 'open'});
@@ -16,7 +17,6 @@ class BookMarkForm extends HTMLElement {
     // We define some inline styles using a template string
     const styles = `
             .bookmarkform{
-            
                 font-family: 'Roboto', sans-serif;
                 margin: 0px;
                 padding: 0px;
@@ -83,7 +83,6 @@ class BookMarkForm extends HTMLElement {
             <style>${styles}</style>
             
             <form  class="bookmarkform">
-            
                 <div id="preview">
                 <img src="${this.preview}" id="previewthumb"/>
                 <div id="takeScreenshot" class="btn"/>take screenshot</div>
@@ -107,14 +106,10 @@ class BookMarkForm extends HTMLElement {
   /* ---------------- CALLBACKS  ------------------------*/
 
   connectedCallback() {
-    this.addBtnEventListener(this);
-    this. enableSubmit();
+    this.addScreenshotEventListener(this);
+    this.enableSubmit(this);
   }
 
-  attributeChangedCallback(name, oldValue, newValue) {
-    console.log('Custom square element attributes changed.');
-    //updateStyle(this);
-  }
 
 
   /* ---------------- ATRIBUTES  ------------------------*/
@@ -135,20 +130,19 @@ class BookMarkForm extends HTMLElement {
    this.setAttribute('tags', newvalue.toString());
   }
 
-  disableSubmit(){
+  disableSubmit(el){
    const submitbtn = this.shadowRoot.getElementById('submit');
-    submitbtn.removeEventListener('click',this.submitForm.bind(this));
     submitbtn.classList.add('disable');
+    // replacing with clone, had issues when tyring to use remove event
+   const clone = submitbtn.cloneNode(true);
+    submitbtn.parentNode.replaceChild(clone, submitbtn);
   }
 
-  enableSubmit(){
+  enableSubmit(el){
+   this.submitable = true;
     const submitbtn = this.shadowRoot.getElementById('submit');
-    submitbtn.addEventListener('click', this.submitForm.bind(this));
+    submitbtn.addEventListener('click', this.submitForm.bind(el),true);
     submitbtn.classList.remove('disable');
-  }
-
-  setAwaitingAnimation(){
-   const shadowroot = this.shadowRoot
   }
 
 
@@ -159,23 +153,26 @@ class BookMarkForm extends HTMLElement {
    return this.shadowRoot.getElementById('tags').value;
   }
 
-  addBtnEventListener(el) {
+
+  addScreenshotEventListener(el) {
     const shadow = el.shadowRoot;
     const btn_scrnshot = shadow.querySelector("#takeScreenshot");
-    btn_scrnshot.addEventListener('click',this.takeScreenshot.bind(el));
+    const takescrnsht = this.takeScreenshot.bind(el);
+    btn_scrnshot.addEventListener('click',takescrnsht,true);
   }
 
 
   submitForm() {
-    console.log('submit form');
-    if (this.url !== '' && this.tags !== []) {
+    if (this.url !== '' && this.tags !== [] && this.submitable === true) {
       let bodystring = {url: this.url,tags: this.tags,thumb: this.preview};
       fetch('http://localhost:3000/api/bookmarks',
         {
           method: 'post',
           body: JSON.stringify(bodystring),
           headers: new Headers({"Content-Type": "application/json"})
-        });
+        }).then(function(){
+        window.location.reload();
+      });
     }
   }
 
@@ -184,14 +181,12 @@ class BookMarkForm extends HTMLElement {
 
   updatePreview(url){
    let tag = this.shadowRoot.getElementById('previewthumb');
-   console.log(tag);
    tag.setAttribute('src', url);
   }
 
 
 
   resolveScreenshot(response) {
-    console.log('3.resolve screenshot triggered');
     let self = this;
     if (response.status !== 200) {
       console.log('Looks like there was a problem. Status Code: ' +
@@ -201,16 +196,11 @@ class BookMarkForm extends HTMLElement {
 
     // Examine the text in the response
     response.json().then(function (data) {
-      console.log('4.' + data);
       self.preview = data.thumb;
-      console.log(self.preview);
       self.updatePreview(self.preview)
-      //setTimeout(function(){self.updatePreview(self.preview)},2000);
-
     });
 
   }
-
 
 
   takeScreenshot() {
@@ -219,12 +209,10 @@ class BookMarkForm extends HTMLElement {
     let url = "http://localhost:3000/api/screenshots?url=" + that.getFormUrl();
     // show an animation in the preview
     this.updatePreview('thumb/waiting.gif');
-    this.disableSubmit();
-    console.log('1.takescreenshot: ' + url);
+    this.disableSubmit(this);
       fetch(url).then((response)=>{
-        console.log(' 2.calling resolve screenshot');
         that.resolveScreenshot(response);
-        that.enableSubmit();
+        that.enableSubmit(this);
         }
       )
         .catch(function (err) {

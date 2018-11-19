@@ -47,6 +47,17 @@
           text-decoration: none;
           cursor: pointer;
         }
+      #openModal{
+        width: 300px;
+        height: 200px;
+        border: 1px solid black;
+        background-color: #7f7f7f;
+      }
+      #openModal span{
+        text-algin: center;
+        padding-top: 80px;
+      }
+
 
     </style>
 </head>
@@ -55,7 +66,7 @@
 </book-mark-grid>
 
 
-<input type="submit" name="+" id="openModal" onclick="openModal()" />
+<div id="openModal" onclick="openModal()"><span>+</span></div>
 <div id="Modal" class="modal">
 
   <!-- Modal content -->

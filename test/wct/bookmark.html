@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+  <title>bookmark</title>
+
+  <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
+  <script src="../../web-component-tester/browser.js"></script>
+  <script src="../../static/bookmark.js"></script>
+
+</head>
+<body>
+<test-fixture id="basic">
+  <template>
+    <book-mark></book-mark>
+  </template>
+</test-fixture>
+
+<script>
+
+
+  /* global a11ySuite */
+  suite('book-mark', function () {
+    var element;
+
+    setup(function (done) {
+      element = fixture('basic');
+      flush(done);
+    });
+
+    test('instantiating the element works', function (done) {
+      assert.equal(element.constructor.is, 'book-mark');
+      flush(() => {
+        done();
+      });
+    });
+
+  });
+
+</script>
+</body>
+</html>

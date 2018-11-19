@@ -1,11 +1,9 @@
 module.exports = function(app, db, jsonParser) {
 
-    var fields = ["EmployeeID", "LastName", "FirstName", "Title", "TitleOfCourtesy",
-        "BirthDate", "HireDate", "Address", "City", "Region", "PostalCode",
-        "Country", "HomePhone", "Extension"];
 
     console.log("Registering endpoint: /api/bookmarks");
 
+    // get all bookmarks
     app.get('/api/bookmarks', function (req, res) {
         console.log("SELECT * FROM bookmarks");
         db.all("SELECT * FROM bookmarks", function (err, rows) {
@@ -13,6 +11,7 @@ module.exports = function(app, db, jsonParser) {
         });
     });
 
+    // post a new bookmark
   app.post('/api/bookmarks',function(req,res){
     console.log(req.body);
     var user_url=req.body.url;
@@ -23,6 +22,17 @@ module.exports = function(app, db, jsonParser) {
     db.run(query);
 
     res.end("yes");
+  });
+
+  // delete a bookmark
+  app.delete('/api/bookmarks/:id',function(req,res){
+
+    let id = req.params.id;
+    console.log('deleting ' + id);
+    let query = `delete from bookmarks where id like '${id}'`;
+
+    db.run(query);
+    res.end("done");
   });
 
 };
