@@ -5,36 +5,33 @@
 
   <title>bookmark</title>
 
-  <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
-  <script src="../../web-component-tester/browser.js"></script>
+  <script src="../..//bower_components/web-component-tester/browser.js"></script>
   <script src="../../static/bookmark.js"></script>
+  <script src="../../bower_components/webcomponentsjs/webcomponents-loader.js"></script>
 
 </head>
 <body>
-<test-fixture id="basic">
-  <template>
-    <book-mark></book-mark>
-  </template>
-</test-fixture>
+
+<book-mark href="http://www.google.com" src="../../static/thumb/default.png" data-id="62"></book-mark>
+
 
 <script>
 
 
   /* global a11ySuite */
   suite('book-mark', function () {
-    var element;
-
-    setup(function (done) {
-      element = fixture('basic');
-      flush(done);
-    });
-
-    test('instantiating the element works', function (done) {
-      assert.equal(element.constructor.is, 'book-mark');
-      flush(() => {
+      test('instantiating the element works', function (done) {
+        let component = document.querySelector('book-mark');
+        assert.isOk(component.shadowRoot.querySelector('div'));
         done();
       });
-    });
+      test('should have a wrapper div with correct class', function(done){
+        let component = document.querySelector('book-mark');
+        let wrapper = component.shadowRoot.querySelector('div');
+        let wrappercss = wrapper.classList.contains('outer');
+        assert.equal(wrappercss, true);
+        done();
+      });
 
   });
 

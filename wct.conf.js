@@ -1,5 +1,5 @@
 module.exports = {
-  suites: ['test/wct/**/*.html', 'src/**/*/test/wct/*.html'],
+  suites: ['test/wct/**/*.html'],
   clientOptions: {
     numConcurrentSuites: 10,
     environmentScripts: [
