@@ -2,4 +2,10 @@ status:
 currently this is an unstable project. Don't use it.
 
 tests:
-make sure you install istanbul global
+make sure you install istanbul, polymer-cli global
+
+running web component unit tests
+polymer serve and go to http://127.0.0.1:8000/test/wct/
+E-2-E tests are done with chimpjs
+- install chimpy global (npm install -g chimpy)
+- run 'chimpy chimp.conf.js' in the root of the project
